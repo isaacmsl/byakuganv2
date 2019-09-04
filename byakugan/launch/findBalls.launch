@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="byakugan" type="pubCircle.py" name="pubCircle"/>
+  <node pkg="byakugan" type="findBalls.py" name="findBalls"/>
+</launch>

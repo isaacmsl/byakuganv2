@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="byakugan" type="pubCircle.py" name="pubCircle"/>
+  <node pkg="byakugan" type="findBalls.py" name="findBalls"/>
+  <node pkg="byakugan" type="pegarVitima.py" name="pegarVitima"/>
+  <node pkg="byakugan" type="findRectangle.py" name="findRectangle"/>
+  <node pkg="byakugan" type="resgate.py" name="resgate"/>
+</launch>

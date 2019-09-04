@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="byakugan" type="showDeBola.py" name="showDeBola"/>
+	<node pkg="byakugan" type="findRectangle.py" name="findRectangle"/>
+</launch>

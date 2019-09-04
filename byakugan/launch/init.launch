@@ -1,0 +1,13 @@
+<launch>
+  <arg name="portArduino" default="/dev/ttyUSB0"/>
+  <arg name="baudArduino" default="115200"/>
+
+  <include file="$(find raspicam_node)/launch/camerav2_320x240_30fps.launch"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="baud" value="$(arg baudArduino)"/>
+    <param name="port" value="$(arg portArduino)"/>
+  </node>
+  <node pkg="byakugan" type="garras.py" name="garras"/>
+  <node pkg="byakugan" type="motores.py" name="motores"/>
+</launch>

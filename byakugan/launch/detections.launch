@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="byakugan" type="showDeArea.py" name="showDeArea"/>
+  <node pkg="byakugan" type="showDeBola.py" name="showDeBola"/>
+</launch>
