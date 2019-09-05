@@ -15,9 +15,9 @@ class CmdGarras:
         self.pub.publish(self.dataGarras)
         self.abrirMao()
         for i in range (0, 2):
-            self.dataGarras.braco.data = 68
+            self.dataGarras.braco.data = 100
             self.pub.publish(self.dataGarras)
-            self.dataGarras.braco.data = 90
+            self.dataGarras.braco.data = 115
             self.pub.publish(self.dataGarras)
 
         self.fecharMao()
