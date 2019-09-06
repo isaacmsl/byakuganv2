@@ -86,6 +86,7 @@ class ShowDeArea():
             contours = self.cookImg() # cozinha a img novamente separando possiveis contours colados na img inicial
 
             indexCntImg = len(contours) - 1
+            rospy.loginfo('oi')
             for i in range(0, indexCntImg): # -1 impede de draw contour da propria img
 
                 cnt = contours[i]
@@ -93,7 +94,8 @@ class ShowDeArea():
                 approx = cv2.approxPolyDP(cnt, .03 * cv2.arcLength(cnt, True), True)
 
                 cX, cY = self.getCentroid(cnt, self.img) # pega centro do contorno
-                #print cX, cY
+                
+                print cX
 
                 area = self.getArea(cnt)
 
@@ -111,6 +113,7 @@ class ShowDeArea():
             print 'error in img'
 
     def callback(self, compressedImg):
+        rospy.loginfo('oi')
         np_arr = np.fromstring(compressedImg.data, np.uint8)
     	self.img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     	self.img = cv2.flip(self.img, 2)

@@ -8,7 +8,7 @@ import cmdMotores
 import cmdGarras
 from geometry_msgs.msg import Vector3Stamped
 from std_msgs.msg import Int32MultiArray
-from byakugan.msg import BoolStamped, SensoresDistanciaMsg, BotoesMsg, CtrlMotores
+from byakugan.msg import BoolStamped, SensoresDistanciaMsg, BotoesMsg, CtrlMotores, BoolGarras
 
 class Sala3():
     def __init__(self):
@@ -22,6 +22,7 @@ class Sala3():
         self.encontrouArea = False
         self.pegou = False
         self.resgatou = False
+        self.chegueiPerto = False
 
         self.entrouNaSala = False
 
@@ -42,6 +43,7 @@ class Sala3():
         ts.registerCallback(self.callback)
     
     def callback(self, btns, coordinates, circle, dist, centroid):
+
         if btns.botao2.data:
             self.podeExecutar = True
         elif btns.botao3.data:
@@ -57,79 +59,81 @@ class Sala3():
                 self.resgatar(centroid, dist)
             elif self.encontrou and self.pegou and self.resgatou:
                 self.executou = True
-    
+        elif self.podeExecutar and self.executou:
+            self.cmdMotores.roboParaTras(1)
+            self.cmdMotores.roboDir(1)
+            self.cmdMotores.roboParar(1)
+            self.reboot()
+
+    def reboot(self):
+        self.encontrou = False
+        self.encontrouArea = False
+        self.pegou = False
+        self.resgatou = False
+        self.chegueiPerto = False
+        self.entrouNaSala = False
+
     def procurar(self, coordinates, circle, dist):
         x, y, r = coordinates.vector.x, coordinates.vector.y, coordinates.vector.z
 
-        if(self.entrouNaSala):
-            if circle.existe.data:
-                self.encontrou = True
+        if circle.existe.data:
+            self.encontrou = True
+            
+            if self.encontrou:
+                self.cmdMotores.roboAcionarMotores(0, 0)
                 
-                if self.encontrou:
+                rospy.loginfo("achei a tete")
+                self.cmdMotores.roboParar(1)
+                
+                '''
+                if x in numpy.arange(200, 280, 1):
                     self.cmd.roboAcionarMotores(0, 0)
-                    
-                    rospy.loginfo("achei a tete")
-                    
-                    '''
-                    if x in numpy.arange(200, 280, 1):
-                        self.cmd.roboAcionarMotores(0, 0)
-                        self.pegarVitima()
-                    '''
+                    self.pegarVitima()
+                '''
+        else:
+            '''
+            if not self.qntAchou < 0:
+                self.qntAchou = self.qntAchou - 1
             else:
-                '''
-                if not self.qntAchou < 0:
-                    self.qntAchou = self.qntAchou - 1
-                else:
-                    self.qntAchou = 0
+                self.qntAchou = 0
+            '''
+            rospy.loginfo("sumiu?!")
+            
+            self.cmdMotores.roboAcionarMotores(-30, 30)
 
-                rospy.loginfo("cade a tete")
-                '''
-                self.cmd.roboAcionarMotores(-30, 30)
-
-    def pegar(self, coordinates):
+    def pegar(self, coordenadas):
         x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
 
-        if(r < 48 and self.encontrei == False ):
+        if(r < 48 and self.chegueiPerto == False):
             rospy.loginfo("Estou longe")
             self.cmdMotores.roboAcionarMotores(30, 34)
         else:
             self.cmdMotores.roboAcionarMotores(0,0)
             rospy.loginfo("Estou perto")
+            self.chegueiPerto = True
 
             self.cmdGarras.abrirMao()
             self.cmdGarras.abaixarBraco()
             self.cmdGarras.fecharMao()
             self.cmdGarras.subirBraco()
-            time.sleep(2)
             self.pegou = True
+            self.cmdMotores.roboParar(3)
 
-    def resgatar(self):
+    def resgatar(self, areaBool, dist):
         if self.encontrouArea and not self.resgatou:
-            if sonar.sensoresDistancia[0] < 6:
+            if dist.sensoresDistancia[0] < 6:
                 self.resgatou = True
-                self.cmd.roboParar(0.8)
+                self.cmdMotores.roboParar(0.8)
                 self.cmdGarras.resgatar()
             else:
-                self.cmd.roboAcionarMotores(30, 34)
+                self.cmdMotores.roboAcionarMotores(30, 34)
         else:
             if areaBool.existe.data == False:
                 rospy.loginfo("cade a tete?")
-                self.cmd.roboAcionarMotores(25, -25)
+                self.cmdMotores.roboAcionarMotores(25, -25)
             else:
-                if areaBool.centroid.data > 30: # area na esq
-                    #self.publishLeds(1, 0, 0)
-                    rospy.loginfo("area na esq")
-                    self.cmd.roboAcionarMotores(-25, 25)
-                    #pass
-                elif areaBool.centroid.data < -50: # area na dir
-                    #self.publishLeds(0, 0, 1)
-                    rospy.loginfo("area na dir")
-                    self.cmd.roboAcionarMotores(25, -25)
-                    #pass
-                elif not self.encontrou:
-                    rospy.loginfo("achei a tete!!!")
-                    self.encontrouArea = True
-                    self.cmd.roboParar(1)
+                self.cmdMotores.roboAcionarMotores(0, 0)
+                self.encontrouArea = True
 
 
 if __name__ == "__main__":

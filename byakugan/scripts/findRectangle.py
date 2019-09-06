@@ -80,6 +80,12 @@ class FindRectangle:
             contours = self.cookImg() # cozinha a img novamente separando possiveis contours colados na img inicial
 
             indexCntImg = len(contours) - 1
+
+            if indexCntImg == 0:
+                areaBool = BoolStamped()
+                areaBool.existe.data = False
+                self.pub.publish(areaBool)
+
             for i in range(0, indexCntImg): # -1 impede de draw contour da propria img
 
                 cnt = contours[i]
@@ -113,7 +119,7 @@ class FindRectangle:
                     self.pub.publish(areaBool)
 
         except: # ???
-            print 'error in img'
+            rospy.loginfo('error in img')
 
     def callback(self, compressedImg):
         np_arr = np.fromstring(compressedImg.data, np.uint8)

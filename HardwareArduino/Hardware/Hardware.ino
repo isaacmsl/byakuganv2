@@ -10,7 +10,7 @@ byakugan::RefletanciaMsg dataRefletancia;
 ros::Publisher pubRefletancia("refletancia", &dataRefletancia);
 
 byakugan::BotoesMsg dataBtns;
-ros::Publisher pubBtns("botoes", &dataBtns);
+ros::Publisher pubBtns("botoes_init", &dataBtns);
 
 byakugan::SensoresDistanciaMsg dataDist;
 ros::Publisher pubDist("distancia", &dataDist);
