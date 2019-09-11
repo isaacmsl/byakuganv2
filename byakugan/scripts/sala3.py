@@ -22,9 +22,20 @@ class Sala3():
         self.encontrouArea = False
         self.pegou = False
         self.resgatou = False
-        self.chegueiPerto = False
+
+        # inits
+        self.initPegar = False
+        self.initResgatar = False
 
         self.entrouNaSala = False
+
+        self.qntVisu = 0
+        self.verificouArea = False
+
+        self.abriu = False
+        self.fechou = False
+        self.abaixou = False
+        self.subiu = False
 
         self.pubGarras = rospy.Publisher('cmdGarras', BoolGarras, queue_size=10)
         self.cmdGarras = cmdGarras.CmdGarras(self.pubGarras)
@@ -53,18 +64,19 @@ class Sala3():
         if self.podeExecutar and not self.executou:
             if not self.encontrou:
                 self.procurar(coordinates, circle, dist)
-            if self.encontrou and not self.pegou:
+            elif self.encontrou and not self.pegou:
                 self.pegar(coordinates)
             elif self.pegou and not self.resgatou:
                 self.resgatar(centroid, dist)
             elif self.encontrou and self.pegou and self.resgatou:
                 self.executou = True
+        '''
         elif self.podeExecutar and self.executou:
             self.cmdMotores.roboParaTras(1)
             self.cmdMotores.roboDir(1)
             self.cmdMotores.roboParar(1)
             self.reboot()
-
+        '''
     def reboot(self):
         self.encontrou = False
         self.encontrouArea = False
@@ -84,6 +96,8 @@ class Sala3():
                 
                 rospy.loginfo("achei a tete")
                 self.cmdMotores.roboParar(1)
+                self.cmdMotores.roboEmFrente(0.5)
+                self.cmdMotores.roboParar(2)
                 
                 '''
                 if x in numpy.arange(200, 280, 1):
@@ -101,39 +115,86 @@ class Sala3():
             
             self.cmdMotores.roboAcionarMotores(-30, 30)
 
+    def zerarPegar(self):
+        self.abriu = False
+        self.fechou = False
+        self.abaixou = False
+        self.subiu = False
+
     def pegar(self, coordenadas):
-        x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
+        if not self.pegou:
+            x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
+            
+            raioPequeno = y < 160
 
-        if(r < 48 and self.chegueiPerto == False):
-            rospy.loginfo("Estou longe")
-            self.cmdMotores.roboAcionarMotores(30, 34)
-        else:
-            self.cmdMotores.roboAcionarMotores(0,0)
-            rospy.loginfo("Estou perto")
-            self.chegueiPerto = True
-
-            self.cmdGarras.abrirMao()
-            self.cmdGarras.abaixarBraco()
-            self.cmdGarras.fecharMao()
-            self.cmdGarras.subirBraco()
-            self.pegou = True
-            self.cmdMotores.roboParar(3)
+            if not raioPequeno:
+                if self.initPegar: 
+                    self.zerarPegar()
+                else:
+                    rospy.loginfo("Estou longe")
+                    self.cmdMotores.roboAcionarMotores(30, 32)
+            elif raioPequeno and not self.pegou:
+                if not self.initPegar:
+                    rospy.logwarn('Parei!')
+                    self.cmdMotores.roboParar(1)
+                    self.initPegar = True
+                elif not self.abriu:
+                    self.cmdGarras.abrirMao()
+                    rospy.loginfo('Abri!')
+                    self.abriu = True
+                elif self.abriu and not self.abaixou:
+                    self.cmdGarras.abaixarBraco()
+                    rospy.loginfo('Abaixei!')
+                    self.abaixou = True
+                elif self.abaixou and not self.fechou:
+                    self.cmdGarras.fecharMao()
+                    rospy.loginfo('Fechei!')
+                    self.fechou = True
+                elif self.fechou and not self.subiu:
+                    self.cmdGarras.subirBraco()
+                    rospy.loginfo('Subi!')
+                    self.subiu = True
+                elif self.subiu:
+                    self.cmdMotores.roboAcionarMotores(0,0)
+                    rospy.loginfo('Parei!')
+                    self.pegou = True
+                    self.cmdMotores.roboParar(2)
+                
 
     def resgatar(self, areaBool, dist):
         if self.encontrouArea and not self.resgatou:
-            if dist.sensoresDistancia[0] < 6:
-                self.resgatou = True
-                self.cmdMotores.roboParar(0.8)
-                self.cmdGarras.resgatar()
+            if self.verificouArea:
+                if dist.sensoresDistancia[0] < 8:
+                    rospy.logwarn('iniciando o pegar')
+                    if not self.initResgatar:
+                        self.cmdMotores.roboParar(2)
+                        rospy.loginfo('Parei!')
+                        self.initResgatar = True
+                    elif not self.resgatou:
+                        self.cmdMotores.roboParar(2)
+                        self.cmdGarras.resgatar()
+                        self.resgatou = True
+                        rospy.loginfo('Resgatei!')
             else:
-                self.cmdMotores.roboAcionarMotores(30, 34)
+                if areaBool.existe.data and self.qntVisu > 10:
+                    self.cmdMotores.roboAcionarMotores(34,34)
+                    self.verificouArea = True
+                elif areaBool.existe.data:
+                    self.qntVisu = self.qntVisu + 1
+                elif not areaBool.existe.data:
+                    self.encontrouArea = False
+
         else:
             if areaBool.existe.data == False:
                 rospy.loginfo("cade a tete?")
+                self.encontrouArea = False
+                self.qntVisu = 0
                 self.cmdMotores.roboAcionarMotores(25, -25)
             else:
-                self.cmdMotores.roboAcionarMotores(0, 0)
+                self.cmdMotores.roboParar(1)
                 self.encontrouArea = True
+                rospy.loginfo('Encontrei a area!')
+                
 
 
 if __name__ == "__main__":

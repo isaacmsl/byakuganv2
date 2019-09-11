@@ -105,21 +105,19 @@ class FindRectangle:
                     # draw centro do contorno e retangulo no contorno
                     print area
 
+                    rospy.loginfo('Encontrei um retangulo')
+
                     areaBool = BoolStamped()
                     areaBool.existe.data = True
 
-                    if area > 20000.0:
-                        areaBool.centroid.data = 111 # robo muito proximo a area
-                    else:
-                        areaBool.centroid.data = int(cX - self.CENTER_X)
+                    areaBool.centroid.data = int(cX - self.CENTER_X)
                     self.pub.publish(areaBool)
                 else:
                     areaBool = BoolStamped()
                     areaBool.existe.data = False
                     self.pub.publish(areaBool)
-
-        except: # ???
-            rospy.loginfo('error in img')
+        except:
+            pass
 
     def callback(self, compressedImg):
         np_arr = np.fromstring(compressedImg.data, np.uint8)
