@@ -11,11 +11,24 @@ from std_msgs.msg import Int32MultiArray
 from byakugan.msg import BoolStamped, SensoresDistanciaMsg, BotoesMsg, CtrlMotores, BoolGarras
 
 class Sala3():
+
+    def PROCURAR(self): return 0
+    def PEGAR(self): return 1
+    def RESGATAR(self): return 2
+    def RETORNAR(self): return 3
+
     def __init__(self):
         rospy.init_node("sala3", anonymous=False)
 
         self.podeExecutar = False
         self.executou = False
+
+        self.estadoRobo = 0
+        self.estadoPegar = 0
+        self.pediuReset = False
+        self.estadoResgatar = 0
+        self.estadoArea = 0
+        self.logIndex = 0
 
         # procurar things
         self.encontrou = False
@@ -55,21 +68,44 @@ class Sala3():
     
     def callback(self, btns, coordinates, circle, dist, centroid):
 
-        if btns.botao2.data:
+        cliqBtn1 = btns.botao2.data
+        cliqBtn3 = btns.botao3.data
+
+        if cliqBtn1 and not self.pediuReset: # primeira execucao
+            rospy.logwarn("Posso executar;")
             self.podeExecutar = True
-        elif btns.botao3.data:
+        elif cliqBtn3 and not self.pediuReset: # pede reset e para execucao
+            rospy.logwarn("Parei porque pediram reset;")
+            self.pediuReset = True
             self.podeExecutar = False
-            self.executou = False
-        
-        if self.podeExecutar and not self.executou:
-            if not self.encontrou:
+        elif cliqBtn1 and self.pediuReset: # reseta execucao
+            rospy.logwarn("Resetando execucao;")
+            self.podeExecutar = True # permite execucao inicial
+            self.pediuReset = False
+            # self.resetVars() ?
+
+        if self.podeExecutar:
+            if self.estadoRobo == self.PROCURAR():
+                if self.logIndex == 0:
+                    self.logIndex = 1
+                    rospy.logwarn("Estou procurando!;")
+
                 self.procurar(coordinates, circle, dist)
-            elif self.encontrou and not self.pegou:
+            elif self.estadoRobo == self.PEGAR():
+                if self.logIndex == 1:
+                    self.logIndex = 2
+                    rospy.logwarn("Vou pegar!;")
+
                 self.pegar(coordinates)
-            elif self.pegou and not self.resgatou:
+            elif self.estadoRobo == self.RESGATAR():
+                if self.logIndex == 2:
+                    self.logIndex = 3
+                    rospy.logwarn("Resgatando...;")
+
                 self.resgatar(centroid, dist)
-            elif self.encontrou and self.pegou and self.resgatou:
-                self.executou = True
+            elif self.estadoRobo == self.RETORNAR():
+                rospy.logwarn("Salvei a vitima!;")
+                #self.executou = True
         '''
         elif self.podeExecutar and self.executou:
             self.cmdMotores.roboParaTras(1)
@@ -77,43 +113,32 @@ class Sala3():
             self.cmdMotores.roboParar(1)
             self.reboot()
         '''
-    def reboot(self):
+    def resetVars(self):
+        self.estadoRobo = 0
+        '''
         self.encontrou = False
         self.encontrouArea = False
         self.pegou = False
         self.resgatou = False
         self.chegueiPerto = False
         self.entrouNaSala = False
+        '''
 
     def procurar(self, coordinates, circle, dist):
-        x, y, r = coordinates.vector.x, coordinates.vector.y, coordinates.vector.z
+        
+        if not self.encontrou:
+            x, y, r = coordinates.vector.x, coordinates.vector.y, coordinates.vector.z
 
-        if circle.existe.data:
-            self.encontrou = True
-            
-            if self.encontrou:
-                self.cmdMotores.roboAcionarMotores(0, 0)
-                
-                rospy.loginfo("achei a tete")
+            if circle.existe.data:
+                rospy.logwarn("Encontrei a vitima!;")
+                self.encontrou = True
                 self.cmdMotores.roboParar(1)
-                self.cmdMotores.roboEmFrente(0.5)
-                self.cmdMotores.roboParar(2)
-                
-                '''
-                if x in numpy.arange(200, 280, 1):
-                    self.cmd.roboAcionarMotores(0, 0)
-                    self.pegarVitima()
-                '''
-        else:
-            '''
-            if not self.qntAchou < 0:
-                self.qntAchou = self.qntAchou - 1
+                rospy.logwarn("Parei;")
+                self.estadoRobo = self.PEGAR()
+                rospy.logwarn("Posicionado para pegar!;")
             else:
-                self.qntAchou = 0
-            '''
-            rospy.loginfo("sumiu?!")
-            
-            self.cmdMotores.roboAcionarMotores(-30, 30)
+                rospy.loginfo("Nao estou encontrando...")
+                self.cmdMotores.roboAcionarMotores(-30, 30)
 
     def zerarPegar(self):
         self.abriu = False
@@ -122,78 +147,99 @@ class Sala3():
         self.subiu = False
 
     def pegar(self, coordenadas):
-        if not self.pegou:
+        if self.estadoPegar == 0:
             x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
             
             raioPequeno = y < 160
 
             if not raioPequeno:
-                if self.initPegar: 
-                    self.zerarPegar()
-                else:
-                    rospy.loginfo("Estou longe")
-                    self.cmdMotores.roboAcionarMotores(30, 32)
-            elif raioPequeno and not self.pegou:
-                if not self.initPegar:
-                    rospy.logwarn('Parei!')
-                    self.cmdMotores.roboParar(1)
-                    self.initPegar = True
-                elif not self.abriu:
-                    self.cmdGarras.abrirMao()
-                    rospy.loginfo('Abri!')
-                    self.abriu = True
-                elif self.abriu and not self.abaixou:
-                    self.cmdGarras.abaixarBraco()
-                    rospy.loginfo('Abaixei!')
-                    self.abaixou = True
-                elif self.abaixou and not self.fechou:
-                    self.cmdGarras.fecharMao()
-                    rospy.loginfo('Fechei!')
-                    self.fechou = True
-                elif self.fechou and not self.subiu:
-                    self.cmdGarras.subirBraco()
-                    rospy.loginfo('Subi!')
-                    self.subiu = True
-                elif self.subiu:
-                    self.cmdMotores.roboAcionarMotores(0,0)
-                    rospy.loginfo('Parei!')
-                    self.pegou = True
-                    self.cmdMotores.roboParar(2)
-                
+                rospy.logwarn("Estou longe")
+                self.cmdMotores.roboAcionarMotores(30, 32)
+            else:
+                self.estadoPegar = 1
+        else:
+            if self.estadoPegar == 1:
+                self.cmdMotores.roboParar(1)
+                rospy.logwarn("Parei;")
+                self.estadoPegar = 2
+
+            elif self.estadoPegar == 2:
+                self.cmdMotores.roboEmFrente(1)
+                rospy.logwarn("Fui um pouco pra frente!;")
+                self.estadoPegar = 3
+
+            elif self.estadoPegar == 3:
+                self.cmdMotores.roboParar(1)
+                rospy.logwarn("Parei novamente;")
+                self.estadoPegar = 4
+            
+            elif self.estadoPegar == 4:
+                self.cmdGarras.abrirMao()
+                rospy.logwarn('Abri!')
+                self.estadoPegar = 5
+
+            elif self.estadoPegar == 5:
+                self.cmdGarras.abaixarBraco()
+                rospy.logwarn('Abaixei!')
+                self.estadoPegar = 6
+
+            elif self.estadoPegar == 6:
+                self.cmdGarras.fecharMao()
+                rospy.logwarn('Fechei!')
+                self.estadoPegar = 7
+
+            elif self.estadoPegar == 7:
+                self.cmdGarras.subirBraco()
+                rospy.logwarn('Subi!')
+                self.estadoPegar = 8
+
+            elif self.estadoPegar == 8:
+                rospy.logwarn('Parei!')
+                self.estadoPegar = 9
+                self.cmdMotores.roboParar(1)
+            
+            elif self.estadoPegar == 9: # aproveita loop callback para demorar um pouco para comecar
+                self.estadoRobo = self.RESGATAR()
+            
 
     def resgatar(self, areaBool, dist):
-        if self.encontrouArea and not self.resgatou:
-            if self.verificouArea:
+        if self.estadoResgatar == 0:
+            if areaBool.existe.data:
+                self.cmdMotores.roboParar(1)
+                rospy.logwarn('Encontrei a area!;')
+                self.estadoResgatar = 1 # robo comecar a verificar
+            else:
+                rospy.logwarn("Procurando area...;")
+                self.cmdMotores.roboAcionarMotores(25, -25)
+
+        elif self.estadoResgatar == 1:
+            if self.verificouArea: # area verifica true
                 if dist.sensoresDistancia[0] < 8:
-                    rospy.logwarn('iniciando o pegar')
-                    if not self.initResgatar:
+
+                    if self.estadoArea == 1:
                         self.cmdMotores.roboParar(2)
-                        rospy.loginfo('Parei!')
-                        self.initResgatar = True
-                    elif not self.resgatou:
-                        self.cmdMotores.roboParar(2)
+                        rospy.logwarn('Parei!')
+                        self.estadoArea = 2
+
+                    elif self.estadoArea == 2:
                         self.cmdGarras.resgatar()
-                        self.resgatou = True
-                        rospy.loginfo('Resgatei!')
+                        rospy.logwarn('Resgatei!')
+                        self.estadoArea = 3
+                        self.estadoRobo = self.RETORNAR()
+                else:
+                    if self.estadoArea == 0:
+                        rospy.logwarn('Indo ate a area...')
+                        self.cmdMotores.roboAcionarMotores(34,34)
+                        self.estadoArea = 1
             else:
                 if areaBool.existe.data and self.qntVisu > 10:
-                    self.cmdMotores.roboAcionarMotores(34,34)
                     self.verificouArea = True
                 elif areaBool.existe.data:
                     self.qntVisu = self.qntVisu + 1
                 elif not areaBool.existe.data:
-                    self.encontrouArea = False
-
-        else:
-            if areaBool.existe.data == False:
-                rospy.loginfo("cade a tete?")
-                self.encontrouArea = False
-                self.qntVisu = 0
-                self.cmdMotores.roboAcionarMotores(25, -25)
-            else:
-                self.cmdMotores.roboParar(1)
-                self.encontrouArea = True
-                rospy.loginfo('Encontrei a area!')
+                    self.estadoPegar = 0 # deixou de verificar
+            
+                
                 
 
 
