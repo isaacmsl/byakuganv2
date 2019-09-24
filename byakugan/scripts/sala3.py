@@ -45,11 +45,6 @@ class Sala3():
         self.qntVisu = 0
         self.verificouArea = False
 
-        self.abriu = False
-        self.fechou = False
-        self.abaixou = False
-        self.subiu = False
-
         self.pubGarras = rospy.Publisher('cmdGarras', BoolGarras, queue_size=10)
         self.cmdGarras = cmdGarras.CmdGarras(self.pubGarras)
 
@@ -140,65 +135,44 @@ class Sala3():
                 rospy.loginfo("Nao estou encontrando...")
                 self.cmdMotores.roboAcionarMotores(-30, 30)
 
-    def zerarPegar(self):
-        self.abriu = False
-        self.fechou = False
-        self.abaixou = False
-        self.subiu = False
-
     def pegar(self, coordenadas):
         if self.estadoPegar == 0:
             x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
             
-            raioPequeno = y < 160
+            raioPequeno = r < 54
+
+            if self.encontrou and self.estadoPegar == 0:
+                self.cmdGarras.abrirMao()
+                self.cmdGarras.abaixarBraco()
+                self.encontrou = False
 
             if not raioPequeno:
                 rospy.logwarn("Estou longe")
                 self.cmdMotores.roboAcionarMotores(30, 32)
-            else:
-                self.estadoPegar = 1
+                else:
+                self.estadoPegar = 1 
         else:
             if self.estadoPegar == 1:
-                self.cmdMotores.roboParar(1)
+                self.cmdMotores.roboParar(0.6)
                 rospy.logwarn("Parei;")
                 self.estadoPegar = 2
 
             elif self.estadoPegar == 2:
-                self.cmdMotores.roboEmFrente(1)
-                rospy.logwarn("Fui um pouco pra frente!;")
-                self.estadoPegar = 3
+                self.cmdGarras.fecharMao()
+                rospy.logwarn('Subi!')
+                self.estadoPegar = 3    
 
             elif self.estadoPegar == 3:
-                self.cmdMotores.roboParar(1)
-                rospy.logwarn("Parei novamente;")
-                self.estadoPegar = 4
-            
-            elif self.estadoPegar == 4:
-                self.cmdGarras.abrirMao()
-                rospy.logwarn('Abri!')
-                self.estadoPegar = 5
-
-            elif self.estadoPegar == 5:
-                self.cmdGarras.abaixarBraco()
-                rospy.logwarn('Abaixei!')
-                self.estadoPegar = 6
-
-            elif self.estadoPegar == 6:
-                self.cmdGarras.fecharMao()
-                rospy.logwarn('Fechei!')
-                self.estadoPegar = 7
-
-            elif self.estadoPegar == 7:
                 self.cmdGarras.subirBraco()
-                rospy.logwarn('Subi!')
-                self.estadoPegar = 8
+                rospy.logwarn('Fechei!')
+                self.estadoPegar = 4
 
-            elif self.estadoPegar == 8:
-                rospy.logwarn('Parei!')
-                self.estadoPegar = 9
-                self.cmdMotores.roboParar(1)
+            elif self.estadoPegar == 4:
+                rospy.logwarn('Peguei!')
+                self.estadoPegar = 5
+            #   self.cmdMotores.roboParar(1)
             
-            elif self.estadoPegar == 9: # aproveita loop callback para demorar um pouco para comecar
+            elif self.estadoPegar == 5: # aproveita loop callback para demorar um pouco para comecar
                 self.estadoRobo = self.RESGATAR()
             
 
