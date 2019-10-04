@@ -10,7 +10,7 @@ byakugan::RefletanciaMsg dataRefletancia;
 ros::Publisher pubRefletancia("refletancia", &dataRefletancia);
 
 byakugan::BotoesMsg dataBtns;
-ros::Publisher pubBtns("botoes", &dataBtns);
+ros::Publisher pubBtns("botoes_init", &dataBtns);
 
 byakugan::SensoresDistanciaMsg dataDist;
 ros::Publisher pubDist("distancia", &dataDist);
@@ -23,35 +23,10 @@ ros::NodeHandle nh;
 */
 void motoresCb(const std_msgs::Int32MultiArray &motores){
   robo.acionarMotores(motores.data[0], motores.data[1]);
-  /*
-  int velEsq = motores.data[0];
-  int velDir = motores.data[1];
-
-  if (velEsq > 0) {
-    digitalWrite(LED_SERVO1, 1);
-  } else {
-    digitalWrite(LED_SERVO1, 0);
-  }
-
-  if (velDir > 0) {
-    digitalWrite(LED_SERVO2, 1);
-  } else {
-    digitalWrite(LED_SERVO2, 0);
-  }
-
-
-  if (motores.data[0] > 0) {
-    digitalWrite(LED_BUILTIN, 1);
-  } else {
-    digitalWrite(LED_BUILTIN, 0);
-  }
-  */
 }
 ros::Subscriber<std_msgs::Int32MultiArray> subMotores("ctrl_motores", &motoresCb);
 
 
-int lastValue0 = 0;
-int lastValue1 = 0;
 
 void garraCb(const std_msgs::Int32MultiArray &garra){
   robo.acionarServoGarra1(garra.data[0]);

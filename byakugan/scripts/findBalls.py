@@ -26,7 +26,9 @@ class FindBalls:
         subCoordinates = message_filters.Subscriber('coordenadas_circulos', Vector3Stamped)
         subBall = message_filters.Subscriber('tem_circulos', BoolStamped)
         subDist = message_filters.Subscriber('distancia', SensoresDistanciaMsg)
-        subBtns = message_filters.Subscriber('botoes', BotoesMsg)
+        subBtns = message_filters.Subscriber('botoes_init', BotoesMsg)
+        subCoordenadas = message_filters.Subscriber('coordenadas_circulos', Vector3Stamped)
+        
 
         ts = message_filters.TimeSynchronizer([subCoordinates, subBall, subDist, subBtns], 20)
         ts.registerCallback(self.ballsCb)
@@ -37,10 +39,14 @@ class FindBalls:
         self.pubPegar.publish(initData)
         self.executou = True
 
-    def ballsCb(self, coordinates, circle, dist, btns):
+    def ballsCb(self, coordinates, circle, dist, btns),:
         if btns.botao2.data:
-            self.podeExecutar = True
-    
+            rospy.loginfo('pode')
+            #self.podeExecutar = True
+        elif btns.botao3.data:
+            rospy.loginfo('!pode')
+            #self.poderExecutar = False
+
         if self.podeExecutar:
             if self.executou == False:
                 x, y, r = coordinates.vector.x, coordinates.vector.y, coordinates.vector.z
