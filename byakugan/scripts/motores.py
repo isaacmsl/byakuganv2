@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Int32MultiArray, Int8
 from byakugan.msg import CtrlMotores
 import time
 
@@ -21,25 +21,26 @@ class Motores():
         self.VEL_ESQ_TRAS = -45
 
         self.dataMotores = Int32MultiArray()
+        self.dataStatus = Int8()
 
         # publisher
         rospy.init_node("motores", anonymous=False)
 
         self.pubMotores = rospy.Publisher("ctrl_motores", Int32MultiArray, queue_size=10)
+        self.pubStatus = rospy.Publisher("status_motores", Int8, queue_size=10, latch=True)
+        
         rospy.loginfo("Setup publisher on ctrl_motores [std_msgs.msg/Int32MultiArray]")
         rospy.Subscriber("cmdMotores", CtrlMotores, self.callback)
         rospy.loginfo("Setup subscriber on cmdMotores [byakugan_msgs.msg/CtrlMotores]")
 
     def callback(self, dataMotores):
 
-        rospy.loginfo(rospy.get_caller_id() + " - msg received!")
+        velEsq = dataMotores.esq.data
+        velDir = dataMotores.dir.data
+        esqFrente = (velEsq == 1)
+        dirFrente = (velDir == 1)
 
-        esq = dataMotores.esq.data
-        dir = dataMotores.dir.data
-        esqFrente = (esq == 1)
-        dirFrente = (dir == 1)
-
-        vel_default = (esq < 2 and dir < 2) # else - acionarMotores(varEsq, varDir)
+        vel_default = (velEsq < 2 and velDir < 2) # else - acionarMotores(varEsq, varDir)
 
         delayPub = dataMotores.delay.data
 
@@ -51,12 +52,12 @@ class Motores():
                     self.__roboEsq(delayPub)
                 elif esqFrente:
                     self.__roboDir(delayPub)
-                elif esq < 0 and dir < 0:
+                elif velEsq < 0 and velDir < 0:
                     self.__roboParaTras(delayPub)
                 else:
                     self.__roboParar(delayPub)
         else:
-            self.__roboAcionarMotores(esq, dir, delayPub)
+            self.__roboAcionarMotores(velEsq, velDir, delayPub)
         '''
         elif esqFrente and dirFrente:
             self.emFrenteRampa(delayPub)
@@ -74,23 +75,31 @@ class Motores():
         iAnterior = -1
 
         dataMotores.data = [velEsq, velDir]
-        if delay == 0:
-                self.pubMotores.publish(dataMotores)
-                rospy.loginfo("[PUBLISHED] - " + str(dataMotores.data))
 
-        while tAtual - tInicio < delay: #
+        # diz que para o no de controle que o motores esta ocupado
+        self.dataStatus.data = 1
+        self.pubStatus.publish(self.dataStatus)
+
+        # publica pela primeira vez
+        self.pubMotores.publish(dataMotores)
+        rospy.loginfo("[PUBLISHED] - " + str(dataMotores.data))
+
+        # publicando com delay
+        while tAtual - tInicio < delay: # pula se delay for zero
             iAtual = int(tAtual - tInicio)
             if iAnterior != iAtual:
+                rospy.loginfo("[LOOPING...] - " + str(iAtual)) # informa laco delay
                 iAnterior = iAtual
-                self.pubMotores.publish(dataMotores)
-                rospy.loginfo("[PUBLISHED] - " + str(dataMotores.data))
-                rospy.loginfo("[PUBLISHING...] time:" + str(iAtual))
             tAtual = time.time()
 
-        if delay != 0:
+        if delay != 0: # quando houver comando motores com delay
             dataMotores.data = [0, 0]
             self.pubMotores.publish(dataMotores)
-            rospy.loginfo("[PUBLISHED] - " + str(dataMotores.data))
+            rospy.loginfo("[STOPPING] - " + str(dataMotores.data))
+        
+        # diz que para o no de controle que o motores esta livre
+        self.dataStatus.data = 0
+        self.pubStatus.publish(self.dataStatus)
 
     # seguir linha
     def __roboAcionarMotores(self, esq, dir, delay=0):
