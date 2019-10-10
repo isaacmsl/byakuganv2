@@ -204,3 +204,6 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+add_executable(acionar src/acionar.cpp)
+target_link_libraries(acionar ${catkin_LIBRARIES})
+add_dependencies(acionar beginner_tutorials_generate_messages_cpp)
