@@ -95,6 +95,8 @@ class Motores():
         if delay != 0: # quando houver comando motores com delay
             dataMotores.data = [0, 0]
             self.pubMotores.publish(dataMotores)
+            dataMotores.data = [0, 0]
+            self.pubMotores.publish(dataMotores)
             rospy.loginfo("[STOPPING] - " + str(dataMotores.data))
         
         # diz que para o no de controle que o motores esta livre
