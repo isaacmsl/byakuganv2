@@ -13,7 +13,14 @@ class Controle:
         self.__statusGarras = Int8()
 
     def btnsCb(self, btns): self.__btns = btns
-    def getBtn(self, i): return self.__btns[i]
+    def getBtn(self, i):
+        if i == 1:
+            return self.__btns.botao1
+        if i == 2:
+            return self.__btns.botao2
+        if i == 3:
+            return self.__btns.botao3
+            
     
     def temCirculoCb(self, circulo): self.__circulo = circulo
     def getCirculo(self): return self.__circulo
@@ -25,7 +32,7 @@ class Controle:
     def getDistancia(self, i): return self.__dist.sensoresDistancia[i]
 
     def retanguloCb(self, centroid): self.__centroid = centroid
-    def getRetangulo(self): return self.__centroid
+    def getCentroid(self): return self.__centroid
     
     def statusMotores(self, statusMotores): self.__statusMotores = statusMotores
     def motorIsBusy(self): return self.__statusMotores.data

@@ -1,5 +1,4 @@
 <launch>
   <node pkg="byakugan" type="pubCircle.py" name="pubCircle"/>
   <node pkg="byakugan" type="findRectangle.py" name="findRectangle"/>
-  <node pkg="byakugan" type="sala3.py" name="sala3"/>
 </launch>
