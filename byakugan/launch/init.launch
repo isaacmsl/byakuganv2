@@ -8,6 +8,13 @@
     <param name="baud" value="$(arg baudArduino)"/>
     <param name="port" value="$(arg portArduino)"/>
   </node>
+  
   <node pkg="byakugan" type="garras.py" name="garras"/>
   <node pkg="byakugan" type="motores.py" name="motores"/>
+
+  <node pkg="byakugan" type="pubCircle.py" name="pubCircle"/>
+  <node pkg="byakugan" type="findRectangle.py" name="findRectangle"/>
+
+  <node pkg="byakugan" type="acionar" name="acionar"/>
+  <node pkg="byakugan" type="testeSala3.py" name="testeSala3"/>
 </launch>

@@ -53,7 +53,7 @@ class TesteSala3:
     def RETORNAR(self): return 3
 
     def resgatar(self):
-
+        
         areaBool = self.c.getCentroid()
         dist = self.c.getDistancia(0) # pega sonar frontal
 
