@@ -3,7 +3,7 @@
 
 import rospy
 import time
-from std_msgs.msg import Int32MultiArray, Int8
+from std_msgs.msg import Int32MultiArray
 from byakugan.msg import BoolGarras
 
 class Garras():
@@ -18,11 +18,11 @@ class Garras():
         self.ANG_FINAL_SUBIR_BRACO = 130
 
         # mao
-        self.ANG_INICIAL_ABRIR_MAO = 100
-        self.ANG_FINAL_ABRIR_MAO = 46
+        self.ANG_INICIAL_ABRIR_MAO = 90
+        self.ANG_FINAL_ABRIR_MAO = 140
 
-        self.ANG_INICIAL_FECHAR_MAO = 46
-        self.ANG_FINAL_FECHAR_MAO = 100
+        self.ANG_INICIAL_FECHAR_MAO = 140
+        self.ANG_FINAL_FECHAR_MAO = 90
 
         self.DELAY = 0.005
         self.BRACO = 1 # diferenciando a publicacao para o braco e a mao
@@ -34,17 +34,16 @@ class Garras():
         self.angAtualMao = 100
         self.angAtualBraco = 130
 
-        self.dataStatus = Int8()
-
         # publisher
         self.rate = rospy.Rate(20)
         self.pubGarras = rospy.Publisher('ctrl_garras', Int32MultiArray, queue_size=10)
-        self.pubStatus = rospy.Publisher("status_garras", Int8, queue_size=10, latch=True)
         rospy.loginfo("Setup publisher on ctrl_motores [std_msgs.msg/Int32MultiArray]")
 
     def __callback(self, dataGarras):
         # mao .. abrir = 1 / fechar = 2 / 0 = nothing
         # braco ..  abaixar = 1 / subir = 2 / 0 = nothing
+
+        rospy.loginfo(rospy.get_caller_id() + " - msg received!")
 
         # testar
 
@@ -83,21 +82,9 @@ class Garras():
 
         dataGarras = Int32MultiArray()
 
-        diferencaAngs = abs(angFinal - angInicial)
-
-        if diferencaAngs % 2 != 0:
-            diferencaAngs += 1
-        
-        passosAngulo = int(diferencaAngs/4) # vai definir 4 angulos para a movimentacao
-
-        # diz que para o no de controle que a garra esta ocupada
-        self.dataStatus.data = 1
-        self.pubStatus.publish(self.dataStatus)
-
         if angInicial > angFinal: # diminuir angulo
             # publica em espaços aos poucos do angInicial ao angFinal
-            passosAngulo = passosAngulo * -1 # para decrementar
-            for i in range(angInicial, angFinal, passosAngulo):
+            for i in range(angInicial, angFinal, -1):
                 if servo == self.BRACO: # diferenciando a publicacao para o braco e a mao
                     dataGarras.data = [self.angAtualMao, i] # [braco, mao]
                     self.angAtualBraco = i
@@ -108,12 +95,10 @@ class Garras():
                 self.pubGarras.publish(dataGarras)
                 rospy.loginfo("[PUBLISHED] ctrl_garras -> " + str(dataGarras.data))
                 #print dataGarras
-                if not i == angFinal:
-                    time.sleep(float(delay))
 
         else:
             # publica em espaços aos poucos do angInicial ao angFinal
-            for i in range(angInicial, angFinal, passosAngulo):
+            for i in range(angInicial, angFinal):
                 if servo == self.BRACO: # diferenciando a publicacao para o braco e a mao
                     dataGarras.data = [self.angAtualMao, i] # [braco, mao]
                     self.angAtualBraco = i
@@ -124,12 +109,7 @@ class Garras():
                 self.pubGarras.publish(dataGarras)
                 rospy.loginfo("[PUBLISHED] ctrl_garras -> " + str(dataGarras.data))
                 #print dataGarras
-                if not i == angFinal:
-                    time.sleep(float(delay))
-        
-        # diz que para o no de controle que a garra esta ocupada
-        self.dataStatus.data = 0
-        self.pubStatus.publish(self.dataStatus)
+                    
 
     def __acionarMao(self, mao):
         self.__setPosicao(self.MAO, self.angAtualMao, mao)

@@ -14,6 +14,8 @@ class TesteSala3:
 
         self.c = Controle()
         
+        self.qntLoops = 0
+        self.qntLoopsResgate = 0
         self.pediuReset = False
         self.podeExecutar = False
 
@@ -21,9 +23,13 @@ class TesteSala3:
         self.logIndex = 0
 
         self.indexVolta = 0
+        self.indexPegarBola = 0
+        self.indexParaCentro = 0
 
         self.encontrouBola = False
         self.estadoPegar = 0
+
+        self.deixouDeVerRampa = False
 
         # resgate things 
         self.estadoResgatar = 0
@@ -47,10 +53,12 @@ class TesteSala3:
         rospy.Subscriber("status_motores", Int8, self.c.statusMotores)
         rospy.Subscriber("status_garras", Int8, self.c.statusGarras)
 
-    def PROCURAR(self): return 0
-    def PEGAR(self): return 1
-    def RESGATAR(self): return 2
-    def RETORNAR(self): return 3
+    def SUBIR_RAMPA(self): return 0
+    def IR_PARA_CENTRO(self): return 1
+    def PROCURAR(self): return 2
+    def PEGAR(self): return 3
+    def RESGATAR(self): return 4
+    def RETORNAR(self): return 5
 
     def resgatar(self):
         
@@ -60,7 +68,7 @@ class TesteSala3:
         if self.estadoResgatar == 0:
             if areaBool.existe.data:
                 if not self.c.motorIsBusy():
-                    self.cmdMotores.roboParar(1)
+                    self.cmdMotores.roboParar()
                     rospy.logwarn('Encontrei a area!')
                     self.estadoResgatar = 1 # robo comecar a verificar
                 else:
@@ -68,7 +76,7 @@ class TesteSala3:
             else:
                 if not self.c.motorIsBusy():
                     rospy.logwarn("Procurando area...;")
-                    self.cmdMotores.roboAcionarMotores(25, -25)
+                    self.cmdMotores.roboAcionarMotores(30, -30)
 
         elif self.estadoResgatar == 1:
             if self.verificouArea: # area verifica true
@@ -76,7 +84,7 @@ class TesteSala3:
 
                     if self.estadoArea == 1:
                         if not self.c.motorIsBusy():
-                            self.cmdMotores.roboParar(2)
+                            self.cmdMotores.roboParar()
                             rospy.logwarn('Parei!')
                             self.estadoArea = 2
                         else:
@@ -84,7 +92,7 @@ class TesteSala3:
 
                     elif self.estadoArea == 2:
                         if not self.c.motorIsBusy() and not self.c.garraIsBusy():
-                            # self.cmdGarras.resgatar()
+                            self.cmdGarras.resgatar()
                             rospy.logwarn('Resgatei!')
                             self.estadoArea = 3
                             self.estadoRobo = self.RETORNAR()
@@ -95,13 +103,13 @@ class TesteSala3:
                     if self.estadoArea == 0: # inicio do resgate
                         if not self.c.motorIsBusy():
                             rospy.logwarn('Indo ate a area...')
-                            self.cmdMotores.roboAcionarMotores(34,34)
+                            self.cmdMotores.roboAcionarMotores(30,34)
                             self.estadoArea = 1
                         else:
                             rospy.logwarn('Esperando motores para poder ir para area')
                             
             else:
-                if areaBool.existe.data and self.qntVisu > 10:
+                if areaBool.existe.data and self.qntVisu > 6:
                     self.verificouArea = True
                 elif areaBool.existe.data:
                     self.qntVisu = self.qntVisu + 1
@@ -115,46 +123,49 @@ class TesteSala3:
         if self.estadoPegar == 0:
             x, y, r = coordenadas.vector.x, coordenadas.vector.y, coordenadas.vector.z
             
-            raioPequeno = r < 54
+            raioPequeno = r < 40
 
             if self.encontrouBola and self.estadoPegar == 0:
-                if not self.c.motorIsBusy() and not self.c.garraIsBusy():
-                    self.cmdGarras.abrirMao()
-                    self.cmdGarras.abaixarBraco()
-                    self.encontrouBola = False # necessario?
+                self.cmdGarras.abrirMao()
+                self.encontrouBola = False # necessario?
 
-            if not raioPequeno:
+            if raioPequeno:
                 rospy.logwarn("Estou longe")
-                if not self.c.motorIsBusy():
-                    self.cmdMotores.roboAcionarMotores(30, 32)
+                self.cmdMotores.roboAcionarMotores(30, 32)
             else:
                 self.estadoPegar = 1 # ta perto da vitima
         else:
             if self.estadoPegar == 1:
-                if not self.c.motorIsBusy():
-                    self.cmdMotores.roboParar(0.6)
-                    rospy.logwarn("Parei;")
+                if self.indexPegarBola == 0:
+                    self.cmdMotores.roboParar()
+                    rospy.logwarn("Parei")
+                    self.indexPegarBola = 1
+                elif self.indexPegarBola == 1:
+                    self.cmdGarras.abaixarBraco()
+                    rospy.logwarn("Abaixei")
                     self.estadoPegar = 2
 
             elif self.estadoPegar == 2:
                 # verificar o motor ajuda?
-                # coloquei para impedir algum tipo de interferencia que possa acontecer
-                if not self.c.motorIsBusy() and not self.c.garraIsBusy():
-                    self.cmdGarras.fecharMao()
-                    rospy.logwarn('Subi!')
-                    self.estadoPegar = 3    
+                self.cmdGarras.fecharMao()
+                rospy.logwarn('Fechei!')
+                self.estadoPegar = 3    
 
             elif self.estadoPegar == 3:
                 if not self.c.garraIsBusy():
                     self.cmdGarras.subirBraco()
-                    rospy.logwarn('Fechei!')
+                    rospy.logwarn('Subi!')
                     self.estadoPegar = 4
 
             elif self.estadoPegar == 4:
-                if not self.c.motorIsBusy():
-                    self.cmdMotores.roboParar(1)
-                    rospy.logwarn('Peguei!')
+                self.cmdMotores.roboParar()
+                rospy.logwarn('Peguei!')
+
+                self.qntLoopsResgate += 1
+                if self.qntLoopsResgate == 20:
+                    self.qntLoopsResgate = 0
                     self.estadoPegar = 5
+                
 
             elif self.estadoPegar == 5: # aproveita loop callback para demorar um pouco para comecar
                 self.estadoRobo = self.RESGATAR()
@@ -173,7 +184,7 @@ class TesteSala3:
             if circle.existe.data:
                 self.encontrouBola = True
                 if not self.c.motorIsBusy(): # faz mesma coisa
-                    self.cmdMotores.roboParar(1)
+                    self.cmdMotores.roboParar()
                     rospy.logwarn("Parei")
                     rospy.logwarn("Encontrei a vitima!")
                     self.encontrouBola = True
@@ -186,7 +197,7 @@ class TesteSala3:
                     self.cmdMotores.roboAcionarMotores(-30, 30)
 
         elif not self.c.motorIsBusy(): # faz mesma coisa
-            self.cmdMotores.roboParar(1)
+            self.cmdMotores.roboParar()
             rospy.logwarn("Parei")
             rospy.logwarn("Encontrei a vitima!")
             self.encontrouBola = True
@@ -204,6 +215,10 @@ class TesteSala3:
         self.estadoPegar = 0
 
         self.indexVolta = 0
+        self.indexPegarBola = 0
+        self.indexParaCentro = 0
+
+        self.deixouDeVerRampa = False
 
         # resgate things 
         self.estadoResgatar = 0
@@ -215,6 +230,11 @@ class TesteSala3:
         
         cliqBtn1 = self.c.getBtn(1).data
         cliqBtn3 = self.c.getBtn(3).data
+
+        sonarLateral = self.c.getDistancia(1)
+
+        if sonarLateral < 10 and not self.deixouDeVerRampa:
+            self.deixouDeVerRampa = True
 
         if cliqBtn1 and not self.pediuReset: # primeira execucao
             rospy.logwarn("Posso executar")
@@ -228,9 +248,38 @@ class TesteSala3:
             self.podeExecutar = True # permite execucao inicial
             self.pediuReset = False
             self.resetVars()
+
         
-        if self.podeExecutar:
-            if self.estadoRobo == self.PROCURAR():
+
+        if self.podeExecutar and self.deixouDeVerRampa:
+            
+            if self.estadoRobo == self.SUBIR_RAMPA():
+                self.cmdMotores.roboAcionarMotores(50, 54)
+                self.qntLoops += 1
+                if self.qntLoops == 20:
+                    self.cmdMotores.roboAcionarMotores(0, 0)
+                    self.qntLoops = 0
+                    self.estadoRobo = self.IR_PARA_CENTRO()
+            
+            elif self.estadoRobo == self.IR_PARA_CENTRO():
+                if self.indexParaCentro == 0:
+                    self.cmdMotores.roboAcionarMotores(-30, 30)
+                    self.qntLoops += 1
+                    if self.qntLoops == 8:
+                        self.cmdMotores.roboAcionarMotores(0, 0)
+                        self.qntLoops = 0
+                        self.indexParaCentro = 1
+
+                elif self.indexParaCentro == 1:
+                    self.cmdMotores.roboAcionarMotores(30, 34)
+                    self.qntLoops += 1
+                    if self.qntLoops == 20:
+                        self.cmdMotores.roboAcionarMotores(0, 0)
+                        self.qntLoops = 0
+                        self.estadoRobo = self.PROCURAR()
+                        self.indexParaCentro = 2
+
+            elif self.estadoRobo == self.PROCURAR():
                 if self.logIndex == 0:
                     self.logIndex = 1
                     rospy.logwarn("Estou procurando!")
@@ -243,7 +292,7 @@ class TesteSala3:
                     rospy.logwarn("Vou pegar!")
 
                 self.pegar()
-
+            
             elif self.estadoRobo == self.RESGATAR():
                 if self.logIndex == 2:
                     self.logIndex = 3
@@ -253,24 +302,23 @@ class TesteSala3:
         
             elif self.estadoRobo == self.RETORNAR():
                 if self.indexVolta == 0:
-                    if not self.c.motorIsBusy():
-                        self.cmdMotores.roboParaTras(1.6)
+                    self.cmdMotores.roboParaTras()
+                    self.qntLoops += 1
+                    if self.qntLoops == 20:
+                        self.qntLoops = 0
                         self.indexVolta = 1
-                    else:
-                        rospy.logwarn("Esperando motores para poder ir para tras")
-                elif self.indexVolta == 1:
-                    if not self.c.motorIsBusy():
-                        self.cmdMotores.roboDir(.5)
-                        self.indexVolta = 2
-                    else:
-                        rospy.logwarn("Esperando motores para poder ir para direita")
-                elif self.indexVolta == 2:
-                    if not self.c.motorIsBusy():
-                        self.cmdMotores.roboParar(1)
-                        self.resetVars()
-                    else:
-                        rospy.logwarn("Esperando motores para poder ir para direita")
 
+                elif self.indexVolta == 1:
+                    self.cmdMotores.roboDir()
+                    self.qntLoops += 1
+                    if self.qntLoops == 20:
+                        self.qntLoops = 0
+                        self.indexVolta = 2
+                
+                elif self.indexVolta == 2:
+                    self.cmdMotores.roboParar()
+                    self.resetVars()
+                    
 if __name__ == "__main__":
     ros_node = TesteSala3()
     rospy.spin()
