@@ -25,6 +25,7 @@ class TesteSala3:
         self.indexVolta = 0
         self.indexPegarBola = 0
         self.indexParaCentro = 0
+        self.indexSeAlinhar = 0
 
         self.encontrouBola = False
         self.estadoPegar = 0
@@ -76,7 +77,7 @@ class TesteSala3:
             else:
                 if not self.c.motorIsBusy():
                     rospy.logwarn("Procurando area...;")
-                    self.cmdMotores.roboAcionarMotores(30, -30)
+                    self.cmdMotores.roboAcionarMotores(-20, 20)
 
         elif self.estadoResgatar == 1:
             if self.verificouArea: # area verifica true
@@ -103,7 +104,7 @@ class TesteSala3:
                     if self.estadoArea == 0: # inicio do resgate
                         if not self.c.motorIsBusy():
                             rospy.logwarn('Indo ate a area...')
-                            self.cmdMotores.roboAcionarMotores(30,34)
+                            self.cmdMotores.roboAcionarMotores(36,40)
                             self.estadoArea = 1
                         else:
                             rospy.logwarn('Esperando motores para poder ir para area')
@@ -131,7 +132,7 @@ class TesteSala3:
 
             if raioPequeno:
                 rospy.logwarn("Estou longe")
-                self.cmdMotores.roboAcionarMotores(30, 32)
+                self.cmdMotores.roboAcionarMotores(34, 34)
             else:
                 self.estadoPegar = 1 # ta perto da vitima
         else:
@@ -194,7 +195,7 @@ class TesteSala3:
                 rospy.loginfo("Nao estou encontrando...")
 
                 if not self.c.motorIsBusy():
-                    self.cmdMotores.roboAcionarMotores(-30, 30)
+                    self.cmdMotores.roboAcionarMotores(30, -30)
 
         elif not self.c.motorIsBusy(): # faz mesma coisa
             self.cmdMotores.roboParar()
@@ -217,8 +218,7 @@ class TesteSala3:
         self.indexVolta = 0
         self.indexPegarBola = 0
         self.indexParaCentro = 0
-
-        self.deixouDeVerRampa = False
+        self.indexSeAlinhar = 0
 
         # resgate things 
         self.estadoResgatar = 0
@@ -240,6 +240,7 @@ class TesteSala3:
             rospy.logwarn("Posso executar")
             self.podeExecutar = True
         elif cliqBtn3 and not self.pediuReset: # pede reset e para execucao
+            self.cmdMotores.roboAcionarMotores(0, 0)
             rospy.logwarn("Parei porque pediram reset")
             self.pediuReset = True
             self.podeExecutar = False
@@ -248,8 +249,6 @@ class TesteSala3:
             self.podeExecutar = True # permite execucao inicial
             self.pediuReset = False
             self.resetVars()
-
-        
 
         if self.podeExecutar and self.deixouDeVerRampa:
             
@@ -263,9 +262,9 @@ class TesteSala3:
             
             elif self.estadoRobo == self.IR_PARA_CENTRO():
                 if self.indexParaCentro == 0:
-                    self.cmdMotores.roboAcionarMotores(-30, 30)
+                    self.cmdMotores.roboAcionarMotores(10, 50)
                     self.qntLoops += 1
-                    if self.qntLoops == 8:
+                    if self.qntLoops == 15:
                         self.cmdMotores.roboAcionarMotores(0, 0)
                         self.qntLoops = 0
                         self.indexParaCentro = 1
@@ -304,7 +303,7 @@ class TesteSala3:
                 if self.indexVolta == 0:
                     self.cmdMotores.roboParaTras()
                     self.qntLoops += 1
-                    if self.qntLoops == 20:
+                    if self.qntLoops == 30:
                         self.qntLoops = 0
                         self.indexVolta = 1
 
@@ -318,6 +317,7 @@ class TesteSala3:
                 elif self.indexVolta == 2:
                     self.cmdMotores.roboParar()
                     self.resetVars()
+                    self.estadoRobo = self.PROCURAR()
                     
 if __name__ == "__main__":
     ros_node = TesteSala3()

@@ -11,11 +11,11 @@ class Garras():
         rospy.Subscriber('cmdGarras', BoolGarras, self.__callback)
 
         # braco
-        self.ANG_INICIAL_BAIXAR_BRACO = 130
+        self.ANG_INICIAL_BAIXAR_BRACO = 150
         self.ANG_FINAL_BAIXAR_BRACO = 46
 
         self.ANG_INICIAL_SUBIR_BRACO = 46
-        self.ANG_FINAL_SUBIR_BRACO = 130
+        self.ANG_FINAL_SUBIR_BRACO = 150
 
         # mao
         self.ANG_INICIAL_ABRIR_MAO = 90
