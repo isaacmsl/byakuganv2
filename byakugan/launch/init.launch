@@ -16,5 +16,5 @@
   <node pkg="byakugan" type="findRectangle.py" name="findRectangle"/>
 
   <node pkg="byakugan" type="acionar" name="acionar"/>
-  <node pkg="byakugan" type="testeSala3.py" name="testeSala3"/>
+  <!-- <node pkg="byakugan" type="testeSala3.py" name="testeSala3"/> -->
 </launch>
