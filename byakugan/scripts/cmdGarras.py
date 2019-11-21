@@ -11,17 +11,17 @@ class CmdGarras:
 
     def resgatar(self):
         self.dataGarras.mao.data = 0
-        self.dataGarras.braco.data = 60
+        self.dataGarras.braco.data = 45
         self.pub.publish(self.dataGarras)
         self.abrirMao()
         for i in range (0, 2):
-            self.dataGarras.braco.data = 60
+            self.dataGarras.braco.data = 45
             self.pub.publish(self.dataGarras)
-            self.dataGarras.braco.data = 100
+            self.dataGarras.braco.data = 85
             self.pub.publish(self.dataGarras)
 
         self.fecharMao()
-        self.dataGarras.braco.data = 130
+        self.dataGarras.braco.data = 115
         self.pub.publish(self.dataGarras)
 
     def abrirMao(self):
