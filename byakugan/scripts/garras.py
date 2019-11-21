@@ -11,18 +11,18 @@ class Garras():
         rospy.Subscriber('cmdGarras', BoolGarras, self.__callback)
 
         # braco
-        self.ANG_INICIAL_BAIXAR_BRACO = 150
-        self.ANG_FINAL_BAIXAR_BRACO = 46
+        self.ANG_INICIAL_BAIXAR_BRACO = 115
+        self.ANG_FINAL_BAIXAR_BRACO = 1
 
-        self.ANG_INICIAL_SUBIR_BRACO = 46
-        self.ANG_FINAL_SUBIR_BRACO = 150
+        self.ANG_INICIAL_SUBIR_BRACO = 1
+        self.ANG_FINAL_SUBIR_BRACO = 115
 
         # mao
-        self.ANG_INICIAL_ABRIR_MAO = 90
+        self.ANG_INICIAL_ABRIR_MAO = 70
         self.ANG_FINAL_ABRIR_MAO = 140
 
         self.ANG_INICIAL_FECHAR_MAO = 140
-        self.ANG_FINAL_FECHAR_MAO = 90
+        self.ANG_FINAL_FECHAR_MAO = 70
 
         self.DELAY = 0.005
         self.BRACO = 1 # diferenciando a publicacao para o braco e a mao

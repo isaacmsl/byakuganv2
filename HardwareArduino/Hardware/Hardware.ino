@@ -64,8 +64,8 @@ void setup() {
   nh.advertise(pubBtns);
   
   robo.configurar(true);
-  robo.acionarServoGarra2(150);
-  robo.acionarServoGarra1(100);
+  robo.acionarServoGarra2(115);
+  robo.acionarServoGarra1(70);
   //robo.habilitaTCS34(); 
 }
 
