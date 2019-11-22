@@ -50,14 +50,14 @@ def callback(img):
 
 	imgCV = cv2.flip(imgCV, 2)
 
-	imgCV = acharCirculos(imgCV)
+	#imgCV = acharCirculos(imgCV)
 
 	cv2.namedWindow('SHOW_DE_BOLA', cv2.WINDOW_NORMAL)
 	cv2.imshow('SHOW_DE_BOLA', imgCV)
 	cv2.waitKey(1)
 
 def listenerImg():
-	rospy.init_node('showAllCircles', anonymous=True)
+	rospy.init_node('showDeBola', anonymous=True)
 	rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, callback)
 	rospy.spin()
 

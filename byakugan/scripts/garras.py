@@ -18,11 +18,11 @@ class Garras():
         self.ANG_FINAL_SUBIR_BRACO = 115
 
         # mao
-        self.ANG_INICIAL_ABRIR_MAO = 70
+        self.ANG_INICIAL_ABRIR_MAO = 68
         self.ANG_FINAL_ABRIR_MAO = 140
 
         self.ANG_INICIAL_FECHAR_MAO = 140
-        self.ANG_FINAL_FECHAR_MAO = 70
+        self.ANG_FINAL_FECHAR_MAO = 68
 
         self.DELAY = 0.005
         self.BRACO = 1 # diferenciando a publicacao para o braco e a mao

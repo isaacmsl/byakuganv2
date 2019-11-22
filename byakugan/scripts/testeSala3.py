@@ -100,11 +100,15 @@ class TesteSala3:
                 self.estadoResgatar = 2
         
         elif self.estadoResgatar == 2:
-            
-                if not self.qntLoopsSalvar == 5:
+                if self.qntLoopsSalvar < 10:
                     self.qntLoopsSalvar += 1
-                    
-                else: # PODE RESGATAR 
+                    self.cmdMotores.roboEmFrente()
+
+                elif self.qntLoopsSalvar < 12:
+                    self.cmdMotores.roboParar()
+                    self.qntLoopsSalvar += 1
+
+                elif self.qntLoopsSalvar == 12: # PODE RESGATAR 
                     self.cmdGarras.resgatar()
                     rospy.logwarn('Resgatei!')
                     self.estadoRobo = self.RETORNAR()
@@ -191,6 +195,9 @@ class TesteSala3:
             elif self.estadoPegar == 7: # aproveita loop callback para demorar um pouco para comecar
                 self.estadoRobo = self.RESGATAR()
 
+                ''' AQUI FAZ PAUSAR DEPOIS DE EXECUTAR '''
+                self.podeExecutar = False
+
     def procurar(self):
         
         coordenadas = self.c.getCoordenadaCirculo()
@@ -210,6 +217,12 @@ class TesteSala3:
                     rospy.logwarn("Encontrei a vitima!")
                     self.encontrouBola = True
                     self.estadoRobo = self.PEGAR()
+
+
+                    ''' AQUI FAZ PAUSAR DEPOIS DE EXECUTAR '''
+                    self.podeExecutar = False
+
+
                     rospy.logwarn("Posicionado para pegar!")
             else:
                 rospy.loginfo("Nao estou encontrando...")
@@ -257,8 +270,6 @@ class TesteSala3:
         
         cliqBtn1 = self.c.getBtn(1).data
         cliqBtn3 = self.c.getBtn(3).data
-
-        rospy.logwarn(cliqBtn1)
 
         sonarLateral = self.c.getDistancia(1)
 
@@ -326,7 +337,7 @@ class TesteSala3:
                 if self.logIndex == 2:
                     self.logIndex = 3
                     rospy.logwarn("Resgatando...")
-
+ 
                 self.resgatar()
         
             elif self.estadoRobo == self.RETORNAR():
