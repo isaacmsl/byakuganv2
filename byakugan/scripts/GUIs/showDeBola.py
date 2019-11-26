@@ -50,7 +50,7 @@ def callback(img):
 
 	imgCV = cv2.flip(imgCV, 2)
 
-	#imgCV = acharCirculos(imgCV)
+	imgCV = acharCirculos(imgCV)
 
 	cv2.namedWindow('SHOW_DE_BOLA', cv2.WINDOW_NORMAL)
 	cv2.imshow('SHOW_DE_BOLA', imgCV)

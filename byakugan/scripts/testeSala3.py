@@ -18,6 +18,7 @@ class TesteSala3:
         self.qntLoopsResgate = 0
         self.qntLoopsSalvar = 0
         self.qntLoopsPegar = 0
+        self.qntLoopsFechar = 0
         self.qntVisuBola = 0
         self.qntNaoVisuBola = 0
         self.qntVisuArea = 0
@@ -171,10 +172,16 @@ class TesteSala3:
                     self.estadoPegar = 4
 
             elif self.estadoPegar == 4:
-                # verificar o motor ajuda?
-                self.cmdGarras.fecharMao()
-                rospy.logwarn('Fechei!')
-                self.estadoPegar = 5
+                # verificar o motor ajuda?qr
+                if self.qntLoopsFechar == 0:
+                    self.cmdGarras.fecharMao()
+                    rospy.logwarn('Fechei!')
+                    self.qntLoopsFechar += 1
+                elif self.qntLoopsFechar > 0 and self.qntLoopsFechar < 10:
+                    self.qntLoopsFechar += 1
+                elif self.qntLoopsFechar >= 10:
+                    self.estadoPegar = 5
+                    self.qntLoopsFechar = 0
 
             elif self.estadoPegar == 5:
                 if not self.c.garraIsBusy():
@@ -248,6 +255,7 @@ class TesteSala3:
         self.qntVisuArea = 0
         self.qntLoopsPegar = 0
         self.qntLoopsSalvar = 0
+        self.qntLoopsFechar = 0
         self.encontrouBola = False
         self.estadoPegar = 0
 
