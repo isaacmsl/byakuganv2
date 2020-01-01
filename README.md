@@ -7,7 +7,7 @@
 - Lennedy Campos Soares;
 - Paulo Vitor Lima Borges.
 
-### Objetivo específico do projeto:
+### Objetivos específicos do projeto:
 
 - Implementar métodos de
 tratamento de imagem em um
