@@ -1,0 +1,4 @@
+#!/bin/bash
+
+scp -r ~/byakuganv2/byakugan lennedy@robo1:~/Byakugan_ws/src
+
