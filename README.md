@@ -16,4 +16,4 @@ robô seguidor de linha;
 para o desafio resgate de vítimas em um cenário de desastre
 propostos pela OBR;
 
-#### Contato: isaacmarlondasilvalourenco@gmail.com
+#### Contato: byakugan.pi@gmail.com
