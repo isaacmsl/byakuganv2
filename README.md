@@ -1,7 +1,7 @@
 # Byakugan: Visão Computacional
 
 ![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
- ![License](https://img.shields.io/github/license/PauloVLB/byakuganv2)
+![License](https://img.shields.io/github/license/isaacmsl/byakuganv2)
 
 - [Resumo](#resumo)
 - [Tecnologias utilizadas](#tecnologias-utilizadas)
