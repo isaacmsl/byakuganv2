@@ -52,13 +52,13 @@ poluição visual; iluminação; profundidade; processamento saturado (imagens d
 
 
 <div width="50%" style="text-align: center">
-<img src="https://user-images.githubusercontent.com/31678236/94749031-2e60ca80-0359-11eb-9049-096aa08827b0.png" width="100%" style="object-fit: cover; object-position: center;">
+<img src="https://user-images.githubusercontent.com/31678236/94749031-2e60ca80-0359-11eb-9049-096aa08827b0.png" width="350" style="object-fit: cover; object-position: center;">
 
 **Figura 1 - Detecção de vítima viva (prateada) e morta (escura) com diferentes profundidades**
 </div>
 
 <div width="50%" style="text-align: center">
-<img src="https://user-images.githubusercontent.com/31678236/94749105-58b28800-0359-11eb-8210-e70448c1d756.png" width="100%" style="object-fit: cover; object-position: center;">
+<img src="https://user-images.githubusercontent.com/31678236/94749105-58b28800-0359-11eb-8210-e70448c1d756.png" width="350" style="object-fit: cover; object-position: center;">
 
 **Figura 2 - Detecção da área de resgate com vítima prateada
 obstruindo a visão**
@@ -68,17 +68,21 @@ obstruindo a visão**
 
 Na OBR do ano de 2019, esse projeto foi contemplado com o prêmio extra de "Inovação" por ser o único robô da competição utilizando tecnologias de tratamento e processamento de imagens. O robô do projeto foi utilizado pela [equipe Wall-E](https://github.com/IFRN-SC/Wall-E-2018-) do IFRN Campus Santa Cruz (**Figura 3**).
 
-<img src="https://user-images.githubusercontent.com/31678236/94749507-556bcc00-035a-11eb-92fa-9905a9b58741.png" width="100%">
+<div style="text-align: center">
+<img src="https://user-images.githubusercontent.com/31678236/94749507-556bcc00-035a-11eb-92fa-9905a9b58741.png" width="350"></img>
 
 **Figura 3 - Robô Wall-E com crachá de participação e medalha de premiação.**
+</div>
 
 ### Premiação MNR 2019
 
 Esse projeto foi convidado a participar da Mostra Nacional de Robótica (MNR) 2019, sediada na cidade de Rio Grande, RS. Como resultado da apresentação, foi premiado como um dos projetos destaque, recebendo por isso, a proposta de Bolsa de Iniciação Científica Júnior (ICJr) (**Figura 4**).
 
-<img src="https://user-images.githubusercontent.com/31678236/94750097-b6e06a80-035b-11eb-89d3-043c8cb9df8e.png" width="100%">
+<div style="text-align: center">
+<img src="https://user-images.githubusercontent.com/31678236/94750097-b6e06a80-035b-11eb-89d3-043c8cb9df8e.png" width="350">
 
 **Figura 4 - Integrantes do projeto e avaliador da MNR 2019**
+</div>
 
 ## Mais Detalhes
 
