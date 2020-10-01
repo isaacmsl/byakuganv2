@@ -51,19 +51,17 @@ Apesar das dificuldades encontradas, como:
 poluição visual; iluminação; profundidade; processamento saturado (imagens de alta qualidade); falhas de comunicação Arduino/Raspberry; problemas com hardware; foi possível alcançar um nível relevante na identificação das vítimas e área de resgate (**Figuras 1 e 2**).
 
 
-<div style="display: flex">
 <div width="50%" style="text-align: center">
-<img src="https://user-images.githubusercontent.com/31678236/94749031-2e60ca80-0359-11eb-9049-096aa08827b0.png" width="100%" height="250" style="object-fit: cover; object-position: center;">
+<img src="https://user-images.githubusercontent.com/31678236/94749031-2e60ca80-0359-11eb-9049-096aa08827b0.png" width="100%" style="object-fit: cover; object-position: center;">
 
 **Figura 1 - Detecção de vítima viva (prateada) e morta (escura) com diferentes profundidades**
 </div>
 
 <div width="50%" style="text-align: center">
-<img src="https://user-images.githubusercontent.com/31678236/94749105-58b28800-0359-11eb-8210-e70448c1d756.png" width="100%" height="250" style="object-fit: cover; object-position: center;">
+<img src="https://user-images.githubusercontent.com/31678236/94749105-58b28800-0359-11eb-8210-e70448c1d756.png" width="100%" style="object-fit: cover; object-position: center;">
 
 **Figura 2 - Detecção da área de resgate com vítima prateada
 obstruindo a visão**
-</div>
 </div>
 
 ### Premiação OBR 2019
