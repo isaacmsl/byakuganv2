@@ -29,9 +29,9 @@ Conhecimento básico de:
 
 Hardware:
 
-- [Componentes eletrônicos utilizados](https://github.com/IFRN-SC/Wall-E-2018-#componentes-eletr%C3%B4nicos) (Opcional. [Veja como contribuir sem possuir o hardware](?))
+- [Componentes eletrônicos utilizados](https://github.com/IFRN-SC/Wall-E-2018-#componentes-eletr%C3%B4nicos) (Opcional. [Veja como contribuir sem possuir o hardware](https://github.com/isaacmsl/byakuganv2/wiki/Como-contribuir-sem-possuir-o-hardware))
 - Sistema Operacional (SO) preferencialmente Ubuntu (linux) [(SOs para ROS)](http://wiki.ros.org/melodic#Platforms)
-- Câmera (caso seu computador não possua, [veja como utilizar a câmera do celular](?))
+- Câmera (caso seu computador não possua, [veja como utilizar a câmera do celular](https://github.com/isaacmsl/byakuganv2/wiki/Como-utilizar-a-c%C3%A2mera-do-celular))
 
 ### Instalações
 
@@ -42,9 +42,9 @@ Hardware:
 
 ### Execução
 
-- [Preparar repositório](?)
+- [Preparar repositório local](https://github.com/isaacmsl/byakuganv2/wiki/Como-preparar-o-reposit%C3%B3rio-local)
 - [Criar workspace ROS](http://wiki.ros.org/pt_BR/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
-- [Configurar pacote ROS](?)
+- [Configurar pacote ROS byakuganv2](https://github.com/isaacmsl/byakuganv2/wiki/Como-configurar-o-pacote-ROS-byakuganv2)
 
 ## Resumo
 
