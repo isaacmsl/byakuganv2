@@ -1,5 +1,5 @@
 ---
-name: Nova funcionalidade
+name: Funcionalidades
 about: Sugira uma nova funcionalidade
 title: ''
 labels: enhancement
